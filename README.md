@@ -37,9 +37,18 @@ See [Azure Python Function quick start](https://docs.microsoft.com/en-us/azure/a
 --name <APP_NAME> --storage-account   <somestoragename> `)
   * Deploy to Azure: `func azure functionapp publish <APP_NAME>`
 
-## Sample request 
-## (Linux / Mac)
-`curl --data-binary "./SampleDataSets/@iris.csv" http://localhost:7071/api/KMeansHttpTrigger`
+## API
+The function expects a POST request with binary, utf8 data and a few parameters:
+ 
+| Parameter | Description                                                | Sample Value | Default Value | Mandatory? |
+|-----------|------------------------------------------------------------------------------------|------|------------|------------|
+| clusters  | Number of clusters returned by the KMeans algorithm                                | 3    |            | Yes        |
+| separator | Your input columns delimiter                                                       | \t   | ,          | No         |
+| col_from  | If you don't want to use all the columns, set to first valid(numeric) column index | 0    | 0          | No         |
+| col_to    | If you don't want to use all the columns, set to last valid(numeric) column index  | 5    | Last Column| No         |
+ 
+### Sample Request (Linux / Mac)
+`curl --data-binary "@SampleDataSets/iris.csv" 'http://localhost:7071/api/KMeansHttpTrigger?clusters=3&col_from=0&col_to=3&separator=,'`
 
 You can download curl for windows as well ([Curl Windows Download](`https://curl.haxx.se/windows/`)) 
 
