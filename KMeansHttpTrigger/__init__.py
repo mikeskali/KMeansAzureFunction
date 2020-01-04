@@ -26,20 +26,20 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     col_to = req.params.get('col_to')
     separator = req.params.get('separator', ",")
 
-    if file_sent:
-        logging.info("Request data: data_size=%s, #of clusters=%s, col_from=%s, col_to=%s, separator=%s",
-                     len(file_sent),
-                     clusters,
-                     col_from,
-                     col_to,
-                     separator)
+    logging.info("Request data: data_size=%s, #of clusters=%s, col_from=%s, col_to=%s, separator=%s",
+                 len(file_sent),
+                 clusters,
+                 col_from,
+                 col_to,
+                 separator)
 
+    if file_sent:
         ret = run_kmeans(csv_data, int(clusters), col_from, col_to, separator)
         return func.HttpResponse(str(ret))
     else:
         logging.error("No data sent in request, returning code 400")
         return func.HttpResponse(
-            "Please pass a file in the request body",
+            "Please pass valid content in the request body",
             status_code=400
         )
 
@@ -47,7 +47,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 def run_kmeans(csv: str, clusters: int, col_from: str, col_to: str, separator: str) -> str:
     df = pd.read_csv(StringIO(csv), sep=separator)
 
-    # validating col_from and col_to. In caes not set, initialize to 0:LAST_COLUMN
+    # validating col_from and col_to. In case not set, initialize to 0:LAST_COLUMN
     if len(col_from) > 0:
         col_from = int(col_from)
     else:
