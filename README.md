@@ -50,6 +50,6 @@ The function expects a POST request with binary, utf8 data and a few parameters:
 ### Sample Request (Linux / Mac)
 `curl --data-binary "@SampleDataSets/iris.csv" 'http://localhost:7071/api/KMeansHttpTrigger?clusters=3&col_from=0&col_to=3&separator=,'`
 
-You can download curl for windows as well ([Curl Windows Download](`https://curl.haxx.se/windows/`)) 
+You can download curl for windows as well ([Curl Windows Download](https://curl.haxx.se/windows/)) 
 
 
