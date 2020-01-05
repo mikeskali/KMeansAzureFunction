@@ -2,7 +2,7 @@
 
 ## Prepare
 * As a prerequisite, you should have Python 3.7 and up installed.
-* run pip install . 
+* run pip install -r requirements.txt
 
  ## Usage
  kmeans_cli.py SERVICE_URL DATA_PATH CLUSTERS <flags>
@@ -21,4 +21,4 @@
  Example: `python kmeans_cli.py http://localhost:7071/api/KMeansHttpTrigger ../SampleDataSets/iris.csv --clusters 3 --col_from 0 --col_to 3`
  
  ### More on usage
- This CLI is using [python-fire](https://github.com/google/python-fire/blob/master/docs/using-cli.md#interactive-flag), see the link for various usage patterns.  
+ This CLI is using [python-fire](https://github.com/google/python-fire/blob/master/docs/using-cli.md#interactive-flag), see the link for additional usage patterns.  

@@ -40,14 +40,16 @@ def kmeans(service_url: str, data_path: str, clusters: int, separator=",", col_f
 
         logger.info("")
         logger.info("======================== Clusters =======================")
-        logger.info("sample number: sample coordinates")
+        logger.info("sample number: sample row")
 
         for cluster_id in json['clusters']:
-            logger.info("")
-            logger.info("====== Cluster %s =======", cluster_id)
             cluster = json['clusters'][cluster_id]
+            logger.info("")
+            logger.info("====== Cluster %s (%d members) =======", cluster_id, len(cluster.keys()))
+
             for key in cluster:
                 logger.info(" %s: %s", key, cluster[key])
+
 
 if __name__ == '__main__':
     fire.Fire(kmeans)

@@ -11,14 +11,19 @@ import json
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
 
+    # mandatory parameters
     try:
-        # mandatory parameters
         file_sent = req.get_body()
-        clusters = int(req.params.get('clusters'))
         csv_data = file_sent.decode("utf-8")
-    except ValueError as ve:
-        logging.error("There was an error: %s",  ve)
-        return create_error_response(400, "There was an error: %s" % ve)
+    except Exception as e:
+        logging.error("Failed parsing the body: %s",  e)
+        return create_error_response(400, "There was an error with data parsing: %s" % e)
+
+    try:
+        clusters = int(req.params.get('clusters'))
+    except Exception as e:
+        logging.error("Failed retrieving <clusters> parameter: %s" % e)
+        return create_error_response(400, "Failed retrieving <clusters> parameter: %s" % e)
 
     # optional parameters
     col_from = req.params.get('col_from')
