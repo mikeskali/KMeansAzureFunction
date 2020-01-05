@@ -1,11 +1,12 @@
 import logging
-
+import json
+from io import StringIO
 import azure.functions as func
 import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans
-from io import StringIO
-import json
+
+
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -16,7 +17,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         file_sent = req.get_body()
         csv_data = file_sent.decode("utf-8")
     except Exception as e:
-        logging.error("Failed parsing the body: %s",  e)
+        logging.error("Failed parsing the body: %s", e)
         return create_error_response(400, "There was an error with data parsing: %s" % e)
 
     try:
@@ -43,7 +44,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         except Exception as error:
             return create_error_response(400, "Failed running kmeans on provided input : %s" % error)
         else:
-            return func.HttpResponse(ret)
+            return func.HttpResponse(ret.encode('utf-8'))
     else:
         logging.error("No data sent in request, returning code 400")
         return create_error_response(400, "Please pass valid content in the request body")
@@ -77,7 +78,7 @@ def run_kmeans(csv: str, clusters: int, col_from: str, col_to: str, separator: s
     y_kmeans = kmeans.fit_predict(x)
 
     end = time.time_ns()
-    logging.info("start: %d, end: %d, elapsed: %d ms", start, end, (end - start) / 1000000)
+    logging.info("Successfully performed kmeans, elapsed: %d ms", start, end, (end - start) / 1000000)
 
     return generate_output(df, y_kmeans, col_from, col_to, end-start)
 
