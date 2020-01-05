@@ -2,8 +2,10 @@ import logging
 
 import azure.functions as func
 import pandas as pd
+import numpy as np
 from sklearn.cluster import KMeans
 from io import StringIO
+import json
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -14,12 +16,9 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         file_sent = req.get_body()
         clusters = int(req.params.get('clusters'))
         csv_data = file_sent.decode("utf-8")
-    except ValueError:
-        logging.error("There was an error: %s",  ValueError)
-        return func.HttpResponse(
-            "There was an error: %s" % ValueError,
-            status_code=400
-        )
+    except ValueError as ve:
+        logging.error("There was an error: %s",  ve)
+        return create_error_response(400, "There was an error: %s" % ve)
 
     # optional parameters
     col_from = req.params.get('col_from')
@@ -34,17 +33,21 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                  separator)
 
     if file_sent:
-        ret = run_kmeans(csv_data, int(clusters), col_from, col_to, separator)
-        return func.HttpResponse(str(ret))
+        try:
+            ret = run_kmeans(csv_data, int(clusters), col_from, col_to, separator)
+        except Exception as error:
+            return create_error_response(400, "Failed running kmeans on provided input : %s" % error)
+        else:
+            return func.HttpResponse(ret)
     else:
         logging.error("No data sent in request, returning code 400")
-        return func.HttpResponse(
-            "Please pass valid content in the request body",
-            status_code=400
-        )
+        return create_error_response(400, "Please pass valid content in the request body")
 
 
 def run_kmeans(csv: str, clusters: int, col_from: str, col_to: str, separator: str) -> str:
+    import time
+    start = time.time_ns()
+
     df = pd.read_csv(StringIO(csv), sep=separator)
 
     # validating col_from and col_to. In case not set, initialize to 0:LAST_COLUMN
@@ -61,10 +64,53 @@ def run_kmeans(csv: str, clusters: int, col_from: str, col_to: str, separator: s
     if df.size < 1:
         raise Exception('Data Frame size is too small: %s')
 
+    # x is the actual data set
     x = df.iloc[:, col_from:col_to].values
-    kmeans3 = KMeans(n_clusters=clusters)
-    y_kmeans3 = kmeans3.fit_predict(x)
 
-    return y_kmeans3
+    # run kmeans algorithm
+    kmeans = KMeans(n_clusters=clusters)
+    y_kmeans = kmeans.fit_predict(x)
+
+    end = time.time_ns()
+    logging.info("start: %d, end: %d, elapsed: %d ms", start, end, (end - start) / 1000000)
+
+    return generate_output(df, y_kmeans, col_from, col_to, end-start)
 
 
+def generate_output(df: pd.DataFrame, y_kmeans: np.ndarray, from_col: int, to_col: int, elapsed_time_ns: int) -> str:
+    result = {}
+    stats = {}
+    clusters = {}
+    result['stats'] = stats
+    result['clusters'] = clusters
+
+    for index in range(0, y_kmeans.size):
+        cluster = int(y_kmeans[index])
+
+        if cluster not in clusters.keys():
+            curr_dict = {}
+            clusters[cluster] = curr_dict
+        curr_dict = clusters[cluster]
+        curr_dict[index] = str(df.iloc[index, :].values.tolist()).strip('[]')
+
+    stats['status'] = 'success'
+    stats['took_time_ms'] = elapsed_time_ns / 1000000
+    stats['total samples'] = df.shape[0]
+    stats['total_columns'] = df.shape[1]
+    stats['total_features'] = to_col - from_col
+    stats['clustering_from_col'] = from_col
+    stats['clustering_to_col'] = to_col
+
+    return json.dumps(result, sort_keys=True)
+
+
+def create_error_response(code: int, error: str) -> func.HttpResponse:
+    json_dict = {
+        'err_code': code,
+        'error': error,
+    }
+
+    return func.HttpResponse(
+        json.dumps(json_dict),
+        status_code=code
+    )
