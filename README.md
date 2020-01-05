@@ -4,10 +4,6 @@ A simple Azure Python Function running a KMeans algorithm.
 The function is triggered by an HTTP request. 
 HTTP request will include a features matrix and specify the number of clusters.   
 
-## API
-HTTP Request:
-	post	/api/KMeansHttpTrigger
-
 ## Build and deploy
 ### Prerequisites
 See [Azure Python Function quick start](https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-first-function-python)
