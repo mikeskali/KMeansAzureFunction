@@ -43,6 +43,7 @@ def kmeans(service_url: str, data_path: str, clusters: int, separator=",", col_f
         logger.info("sample number: sample coordinates")
 
         for cluster_id in json['clusters']:
+            logger.info("")
             logger.info("====== Cluster %s =======", cluster_id)
             cluster = json['clusters'][cluster_id]
             for key in cluster:
