@@ -8,7 +8,7 @@ As an alternative(if you don't want to manage Python environments and dependenci
 you can run the cli in a Docker. See Docker section. 
 
  ## Usage
- kmeans_cli.py SERVICE_URL DATA_PATH CLUSTERS <flags>
+ python kmeans_cli.py SERVICE_URL DATA_PATH CLUSTERS <flags>
   optional flags:        --separator | --col_from | --col_to
  
  | Parameter | Description                                                | Sample Value | Default Value | Mandatory? |
