@@ -7,8 +7,6 @@ import numpy as np
 from sklearn.cluster import KMeans
 
 
-
-
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
 
