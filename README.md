@@ -51,9 +51,9 @@ The function expects a POST request with binary, utf8 data and a few parameters:
 `curl --data-binary "@SampleDataSets/iris.csv" 'http://localhost:7071/api/KMeansHttpTrigger?clusters=3&col_from=0&col_to=3&separator=,'`
 
 ## CLI client
+A small cli client makes it easier to send requests and parse responses to the kmeans azure function. 
 See the [cli](cli) directory. 
  
-
-You can download curl for windows as well ([Curl Windows Download](https://curl.haxx.se/windows/)) 
+ 
 
 
