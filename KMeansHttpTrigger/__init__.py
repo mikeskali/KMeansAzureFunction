@@ -1,10 +1,11 @@
 import logging
-import json
-from io import StringIO
+
 import azure.functions as func
 import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans
+from io import StringIO
+import json
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -52,7 +53,12 @@ def run_kmeans(csv: str, clusters: int, col_from: str, col_to: str, separator: s
     import time
     start = time.time_ns()
 
-    df = pd.read_csv(StringIO(csv), sep=separator)
+    try:
+        df = pd.read_csv(StringIO(csv), sep=separator)
+    except Exception as e:
+        error = "Failed loading data into dataframe, %s:%s" % (type(e), e)
+        logging.error(error)
+        raise Exception(error)
 
     # validating col_from and col_to. In case not set, initialize to 0:LAST_COLUMN
     if len(col_from) > 0:
@@ -71,14 +77,26 @@ def run_kmeans(csv: str, clusters: int, col_from: str, col_to: str, separator: s
     # x is the actual data set
     x = df.iloc[:, col_from:col_to].values
 
-    # run kmeans algorithm
-    kmeans = KMeans(n_clusters=clusters)
-    y_kmeans = kmeans.fit_predict(x)
+    try:
+        logging.info("About to run kmeans on data of size: %s", x.shape)
+        kmeans = KMeans(n_clusters=clusters)
+        y_kmeans = kmeans.fit_predict(x)
+    except Exception as e:
+        error = "Failed executing kmeans algorithm, %s:%s" % (type(e), e)
+        logging.error(error)
+        raise Exception(error)
 
     end = time.time_ns()
-    logging.info("Successfully performed kmeans, elapsed: %d ms", start, end, (end - start) / 1000000)
+    logging.info("Successfully performed kmeans, elapsed: %d ms",  (end - start) / 1000000)
 
-    return generate_output(df, y_kmeans, col_from, col_to, end-start)
+    try:
+        json_output = generate_output(df, y_kmeans, col_from, col_to, end-start)
+    except Exception as e:
+        error = "Failed generating output, %s:%s" % (type(e), e)
+        logging.error(error, e)
+        raise Exception(error) from e
+    else:
+        return json_output
 
 
 def generate_output(df: pd.DataFrame, y_kmeans: np.ndarray, from_col: int, to_col: int, elapsed_time_ns: int) -> str:

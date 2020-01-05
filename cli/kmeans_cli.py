@@ -10,13 +10,13 @@ LOGGER.setLevel(level='INFO')
 
 
 def kmeans(service_url: str, data_path: str, clusters: int, separator=",", col_from=0, col_to=0):
-    LOGGER.info("""Preparing to run KMeans.
-                Service URL: %s
-                Data path: %s
-                clusters: %d
-                separator: %s
-                col_from: %d
-                col_to: %d
+    LOGGER.info("""=========== Preparing to run KMeans==========
+Service URL: %s
+Data path: %s
+clusters: %d
+separator: %s
+col_from: %d
+col_to: %d
                 """,
                 service_url, data_path, clusters, separator, col_from, col_to)
 

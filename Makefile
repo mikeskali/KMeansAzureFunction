@@ -6,11 +6,11 @@ run-locally:
 	func host start
 
 send-sample-request-jq:
-	curl --data-binary "@SampleDataSets/iris.csv" 'http://localhost:7071/api/KMeansHttpTrigger?clusters=3&col_from=0&col_to=3&separator=,' | jq
+	curl --data-binary "@SampleDataSets/iris.csv" 'http://localhost:7071/api/KMeansHttpTrigger?clusters=3&col_from=0&col_to=4&separator=,' | jq
 
 
 run-cli-request:
-	python cli/kmeans_cli.py http://localhost:7071/api/KMeansHttpTrigger SampleDataSets/iris.csv --clusters 3 --col_from 0 --col_to 3
+	python cli/kmeans_cli.py http://localhost:7071/api/KMeansHttpTrigger SampleDataSets/iris.csv --clusters 3 --col_from 0 --col_to 4
 
 create-azure-app:
 	az group create --name KMeansAzureFunctionRG --location westeurope && \
